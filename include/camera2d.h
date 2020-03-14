@@ -5,17 +5,14 @@
 
 #include "../include/camera.h"
 
-class Camera2D : public Camera{
-	private:
-	float aspectRatio;
-	
-	public:
-	Camera2D(float x0, float xf, float y0, float yf, float scale);
-	
-	virtual void onResize(int w, int h);
+class Camera2D : public Camera {
+private:
+  float aspectRatio;
+
+public:
+  Camera2D(float x0, float xf, float y0, float yf, float scale);
+
+  virtual void onResize(int w, int h);
 };
 
-
 #endif
-
-

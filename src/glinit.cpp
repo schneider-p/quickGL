@@ -2,8 +2,8 @@
 
 #include <iostream>
 
-#include "../include/shape.h"
 #include "../include/camera.h"
+#include "../include/shape.h"
 #include "../include/tool_base.h"
 
 using namespace std;
@@ -12,114 +12,109 @@ GLuint vao;
 int width = 320;
 int height = 240;
 
-
-// TODO: Should there be a GLInterface class that controls the globals? 
-//       e.g. It will store the active shapes list and active tools list? 
+// TODO: Should there be a GLInterface class that controls the globals?
+//       e.g. It will store the active shapes list and active tools list?
 // 		 Maybe not?
 
-void checkGLError(const char * file, int line){
-	GLenum err;
-	while((err = glGetError()) != GL_NO_ERROR){
-		cout << file << ":" << line << "   Error: " << gluErrorString(err) << endl;
-	}
+void checkGLError(const char *file, int line) {
+  GLenum err;
+  while ((err = glGetError()) != GL_NO_ERROR) {
+    cout << file << ":" << line << "   Error: " << gluErrorString(err) << endl;
+  }
 }
 
-
-void printStatus(const char *step, GLuint context, GLuint status){
-	GLint result = GL_FALSE;
-	CHECK_GL_ERROR();
-	glGetShaderiv(context, status, &result);
-	CHECK_GL_ERROR();
-	if (result == GL_FALSE) {
-		char buffer[1024];
-		if (status == GL_COMPILE_STATUS)
-			glGetShaderInfoLog(context, 1024, NULL, buffer);
-		else
-			glGetProgramInfoLog(context, 1024, NULL, buffer);
-		if (buffer[0])
-			fprintf(stderr, "%s: %s\n", step, buffer);
-	}
+void printStatus(const char *step, GLuint context, GLuint status) {
+  GLint result = GL_FALSE;
+  CHECK_GL_ERROR();
+  glGetShaderiv(context, status, &result);
+  CHECK_GL_ERROR();
+  if (result == GL_FALSE) {
+    char buffer[1024];
+    if (status == GL_COMPILE_STATUS)
+      glGetShaderInfoLog(context, 1024, NULL, buffer);
+    else
+      glGetProgramInfoLog(context, 1024, NULL, buffer);
+    if (buffer[0])
+      fprintf(stderr, "%s: %s\n", step, buffer);
+  }
 }
 
+void onDisplay(void) {
 
-void onDisplay(void){
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  if (Shape::activeCamera == NULL) {
+    cout << "WARNING: No camera is active. Cannot draw." << endl;
+    return;
+  }
 
-	if (Shape::activeCamera == NULL) {
-		cout << "WARNING: No camera is active. Cannot draw." << endl;
-		return;
-	}
+  for (auto it : Shape::allShapes)
+    it->render();
 
-	for (auto it : Shape::allShapes) it->render();	
-
-	glutSwapBuffers();
+  glutSwapBuffers();
 }
 
-
-void onResize(int w, int h){
-//	width = w; height = h;
-	if (Shape::activeCamera) Shape::activeCamera->onResize(w,h); //glViewport(0, 0, (GLsizei)w, (GLsizei)h);
+void onResize(int w, int h) {
+  //	width = w; height = h;
+  if (Shape::activeCamera)
+    Shape::activeCamera->onResize(
+        w, h); // glViewport(0, 0, (GLsizei)w, (GLsizei)h);
 }
 
-
-void onClick(int button, int state, int x, int y){
-	if (!Tool::activeTools.empty())	Tool::activeTools.front()->onClick(button, state, x, y);
+void onClick(int button, int state, int x, int y) {
+  if (!Tool::activeTools.empty())
+    Tool::activeTools.front()->onClick(button, state, x, y);
 }
 
-
-void onMouseMove(int x, int y){
-	if (!Tool::activeTools.empty())	Tool::activeTools.front()->onMouseMove(x, y);
+void onMouseMove(int x, int y) {
+  if (!Tool::activeTools.empty())
+    Tool::activeTools.front()->onMouseMove(x, y);
 }
 
-void onKeyPress(unsigned char key, int x, int y){
-	if (!Tool::activeTools.empty())	Tool::activeTools.front()->onKeyPress(key, x, y);
+void onKeyPress(unsigned char key, int x, int y) {
+  if (!Tool::activeTools.empty())
+    Tool::activeTools.front()->onKeyPress(key, x, y);
 }
 
-void onSpecialKeyPress(int key, int x, int y){
-	if (!Tool::activeTools.empty())	Tool::activeTools.front()->onSpecialKeyPress(key, x, y);
+void onSpecialKeyPress(int key, int x, int y) {
+  if (!Tool::activeTools.empty())
+    Tool::activeTools.front()->onSpecialKeyPress(key, x, y);
 }
 
+void initQuickGL(int argc, char **argv) {
 
-void initQuickGL(int argc, char** argv){
+  glutInit(&argc, argv);
+  glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+  glutInitWindowSize(width, height);
 
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);	
-	glutInitWindowSize(width, height);
+  glutCreateWindow("mini");
 
-	glutCreateWindow("mini");
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+  glEnable(GL_DEPTH_TEST);
 
-	glEnable(GL_BLEND);
-	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+  glEnable(GL_PROGRAM_POINT_SIZE);
 
-	glEnable(GL_DEPTH_TEST);
+  glewExperimental = GL_TRUE;
+  glewInit();
 
-	glEnable(GL_PROGRAM_POINT_SIZE);
+  // BUFFERS etc
 
-	glewExperimental = GL_TRUE;
-	glewInit();
+  glGenVertexArrays(1, &vao);
+  glBindVertexArray(vao);
 
-	// BUFFERS etc
+  glutDisplayFunc(onDisplay);
+  glutReshapeFunc(onResize);
 
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-	glutDisplayFunc(onDisplay);
-	glutReshapeFunc(onResize);
-
-	glutMouseFunc(onClick);
-	glutMotionFunc(onMouseMove);
-	glutKeyboardFunc(onKeyPress);
-	glutSpecialFunc(onSpecialKeyPress);	
-
+  glutMouseFunc(onClick);
+  glutMotionFunc(onMouseMove);
+  glutKeyboardFunc(onKeyPress);
+  glutSpecialFunc(onSpecialKeyPress);
 }
 
-
-void closeQuickGL(){
-	glBindVertexArray(0);
-	glDeleteVertexArrays(1, &vao);
-
+void closeQuickGL() {
+  glBindVertexArray(0);
+  glDeleteVertexArrays(1, &vao);
 }
-

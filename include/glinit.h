@@ -11,12 +11,12 @@ extern GLuint vao;
 extern int width;
 extern int height;
 
-void checkGLError(const char * file, int line);
+void checkGLError(const char *file, int line);
 void printStatus(const char *step, GLuint context, GLuint status);
 
 GLuint loadShader(std::string filename, GLenum shader_type);
 
-void initQuickGL(int argc, char** argv);
+void initQuickGL(int argc, char **argv);
 void closeQuickGL();
 
 void onDisplay(void);
@@ -31,7 +31,4 @@ void onKeyPress(unsigned char key, int x, int y);
 
 void onSpecialKeyPress(int key, int x, int y);
 
-
 #endif
-
-

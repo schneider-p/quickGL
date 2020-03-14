@@ -3,15 +3,10 @@
 
 #include "../include/tool_base.h"
 
-class CameraController : public Tool{
-	public:
-
-	virtual void onClick(int button, int state, int x, int y);
-	virtual void onMouseMove(int x, int y);
-	
+class CameraController : public Tool {
+public:
+  virtual void onClick(int button, int state, int x, int y);
+  virtual void onMouseMove(int x, int y);
 };
 
-
 #endif
-
-

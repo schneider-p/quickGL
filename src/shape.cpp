@@ -20,10 +20,13 @@
 using namespace std;
 
 GLuint loadShader(string filename, GLenum shader_type) {
-  cout << "Loading shader from " << filename << endl;
+  cout << "Loading shader from " << filename << "\n";
   ifstream fin(filename.c_str());
 
-  // FIXME: assert(fin);
+  if (!fin) {
+    cerr << "!!! !!! !!! ERROR: COULD NOT LOAD SHADER SOURCE CODE"
+         << "\n";
+  }
 
   string c((istreambuf_iterator<char>(fin)), istreambuf_iterator<char>());
   const char *glsl_src = c.c_str();
@@ -46,9 +49,10 @@ Shape::Shape(int nverts, GLenum mode) {
   model = world = glm::mat4(1.f);
   visible = true;
 
-  vertexShader = loadShader("shaders/shader_vertex.glsl", GL_VERTEX_SHADER);
+  vertexShader =
+      loadShader("quickGL/shaders/shader_vertex.glsl", GL_VERTEX_SHADER);
   fragmentShader =
-      loadShader("shaders/shader_fragment.glsl", GL_FRAGMENT_SHADER);
+      loadShader("quickGL/shaders/shader_fragment.glsl", GL_FRAGMENT_SHADER);
   CHECK_GL_ERROR();
 
   program = glCreateProgram();

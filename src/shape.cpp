@@ -139,7 +139,7 @@ glm::vec3 Shape::getTransformedBBox1() {
   return world * model * glm::vec4(bbox1, 1.f);
 }
 
-void Shape::setVertices(float *verts) {
+void Shape::setVertices(const float *verts) {
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, 3 * nVertices * sizeof(float), verts,
                GL_DYNAMIC_DRAW);
@@ -162,7 +162,7 @@ void Shape::setVertices(float *verts) {
        << "] [" << bbox1.x << " " << bbox1.y << " " << bbox1.z << "]" << endl;
 }
 
-void Shape::setColors(float *cols) {
+void Shape::setColors(const float *cols) {
   useColor = true;
   glBindBuffer(GL_ARRAY_BUFFER, cbo);
   glBufferData(GL_ARRAY_BUFFER, 4 * nVertices * sizeof(float), cols,

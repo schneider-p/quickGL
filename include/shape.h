@@ -41,8 +41,8 @@ public:
   Shape(int nverts, GLenum mode);
   virtual ~Shape();
 
-  void setVertices(float *verts);
-  void setColors(float *cols);
+  void setVertices(const float *verts);
+  void setColors(const float *cols);
   void setElements(int *ele, int nelements);
   void applyTexture(float *uvs, unsigned char *image, int w, int h);
   void autoExtent();
